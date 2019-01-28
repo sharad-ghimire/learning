@@ -11,7 +11,6 @@
 
 Graphql can be used with a HTTP Client like fetch, axios or superagent request and it just needs payload, url and post method. Apollo is simply an graphql client which has cacheing, formatting the query and http client build in. In other hand, _relay-modern_ has preprocessing (process query ahead of time, so extra build time). It gives better optimization. Whereas in Apollo, we have our React Component and graphql query at the buttom and we can bind those two and create a new component. And we can use that component anywhere and data will be fetched automatically with cacheing and auto UI update.
 
-
 ### graph.cool
 
 It is an SaaS (BaaS to be precise) that allow us to connect to backend without our own server.
@@ -26,11 +25,11 @@ It is an SaaS (BaaS to be precise) that allow us to connect to backend without o
 
 #### Typical Web Application
 
-![Typical Web Application](./images/traditional.png)
+![Typical Web Application](../images/traditional.png)
 
 #### Express and Node Backend
 
-![Express and GrapQL](./images/express-graphql.png)
+![Express and GrapQL](../images/express-graphql.png)
 
 #### Query and Schema
 
@@ -167,5 +166,24 @@ function getItem() {
     }
     
   `);
+}
+```
+
+_For Accessing Token, go to setting and then authentication and create auth there._
+
+### GraphQL Types relationships
+
+```graphql
+type Product @model {
+  ...
+  orders: [Order!]! @relation(name: "OrderOnProduct")
+  ...
+}
+
+<!-- Many to Many Relation -->
+type Order @model {
+  customerEmail: String!
+  id: ID! @isUnique
+  products: [Product!]! @relation(name: "OrderOnProduct")
 }
 ```
