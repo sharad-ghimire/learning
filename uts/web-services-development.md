@@ -889,3 +889,285 @@ Often we need to transform XML to different formats examples: from one Schema to
   generator.renderHTML(matchingBooks, out);
 %>
 ```
+
+## Week 7: REST
+
+#### REST REpresentational State Transfer
+
+REST is a design pattern for creating web applications that are designed to be invoked by other applications.
+
+**Resources and ROA**: REST Web Services are based on the concept of resources. As a starting point, think of a resource like a record in a database. We can Create, Retrieve, Update and Delete (CRUD) resources. Resources can be anything accessible on the web. This leads to a world where applications access and manipulate resources using the web infrastructure and has been called ‘Resources Oriented Architecture ‘ (ROA). Key principles of REST/ROA
+
+- Every resources must have an identifier. URI → Uniform Resource Identifier (Basically same as a URL )
+- Link resources where possible → One resources can refer to other by URI
+- Use standard HTTP methods → GET (Retrieve a resource), POST (Create/Update a resource,usually by changing its component parts) , PUT (Create/Update a resource idempotently.Can be repeated without side effects) , DELETE (Delete a resource). HTTP supports different methods of accessing a resources. Web browsers for humans mostly “GET” pages.
+- Potentially offer multiple representations → XML, JSON, CSV
+- Resources must be stateless → Application state, if required, is maintained by the client
+
+**URI**: Use language that describes the resource – So when we look at the URL it is logical. Try and use the PATH wherever possible to identify resources – One common pattern is: `/collection` = CRUD the whole collection `/collection/item` = CRUD one item within the collection `/collection/item/field` = CRUD 1 field in 1 item in collection.
+
+Minimise use of _QUERY_STRING_: DON’T: `http://localhost/addressbook?user=Ms+Smith` – OK for parameterized algorithms, e.g. `?output=xml`
+
+**AddressBook Example**:
+
+- GET http://localhost/addressbook Get the addressbook
+- DELETE http://localhost/addressbook Delete the addressbook
+- PUT http://localhost/addressbook Upload whole addressbook
+- POST http://localhost/addressbook Post a new entry
+- GET http://localhost/addressbook/Mr%20Suit Get Mr Suit’s entry
+- DELETE http://localhost/addressbook/Mr%20Suit Delete Mr Suit’s entry
+- PUT http://localhost/addressbook/Mr%20Suit Update Mr Suit’s entry
+- POST http://localhost/addressbook/Mr%20Suit Add to Mr Suit’s entry
+
+**HTTP GET request**: `bash\$ telnet localhost 8080`
+
+```
+GET /addressbook/Mr%20Suit HTTP/1.1
+Host: localhost
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Content-Type: application/xml
+Content-Length: 167
+Date: Fri, 05 Apr 2013 00:35:52 GMT
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><entrylist="business"><name>Mr Suit</name><address>1 George St,Sydney</address><phone>555 6666</phone></entry>
+```
+
+**HTTP POST request**
+
+```
+bash$ telnet localhost 8080
+POST /addressbook HTTP/1.1
+Host: localhost
+Content-Length: 75
+Content-Type: application/xml
+<entry list="a"><name>b</name><address>c</address><phone>d</phone></entry>
+HTTP/1.1 204 No Content
+Server: Apache-Coyote/1.1
+Date: Fri, 05 Apr 2013 00:43:07 GMT
+```
+
+**Building a REST Web Service**
+
+A good start : Write a Java Method to handle each request. Example:
+
+```java
+// GET http://localhost/addressbook
+public Addressbook getAddressBook() {
+  return addressBook;
+}
+
+// GET http://localhost/addressbook/Mr%20Suit .
+      // Method parameter: “Mr. Suit”
+      // Return value: the addressbook
+public Entry getEntry(String personName) {
+  for(Entry entry : addressBook) {
+    if(personName.equals(entry.getName())){
+      return entry;
+    }
+  }
+  return null;
+}
+
+// DELETE http://localhost/addressbook
+public void deleteAddressBook() {
+  addressBook.clear();
+}
+
+// DELETE http://localhost/addressbook/Mr%20Suit
+public void deleteEntry(String personName) {
+  Entry entry = getEntry(personName);
+    if (entry != null) addressBook.remove(entry);
+}
+
+// POST http://localhost/addressbook
+public void addEntry(Entry entry) {
+  addressBook.add(entry);
+}
+
+// PUT http://localhost/addressbook/Mr%20Suit
+public void updateEntry(String name, Entry newEntry) {
+  Entry oldEntry = getEntry(name);
+    if (oldEntry != null) {
+      addressBook.remove(oldEntry);
+      addressBook.add(newEntry);
+  }
+}
+
+// Collect all these methods into a POJO
+public class AddressBookService {
+  public Addressbook getAddressBook() {...}
+  public Entry getEntry(String personName) {...}
+  public void deleteAddressBook() {...}
+  public void deleteEntry(String personName) {...}
+  public void addEntry(Entry entry) {...}
+  public void updateEntry(String name, Entry newEntry) {...}
+}
+```
+
+- Our POJO is not yet a web service. What’s missing?
+  - Code to direct which URL goes to which method
+  - Code to extract parameter data from the URL and HTTP request body (POST data) and feed it into our method parameters.
+  - Code to convert the returned addressbook object into XML to be sent as an HTTP response.
+  - And the good news is we don’t have to write any more code. Annotations can manage the rest.
+
+## JAX-RS and Jersey
+
+JAX-RS is a JAVA API for RESTful Web Services. Jersey reference implementation of JAX-RS. JAX-RS takes a POJO and adds annotations that enable it to be used as a REST Web Service when run inside a web container (like Tomcat). Some JAX-RS annotations
+
+1. `@GET, @POST, @PUT, @DELETE` : specific HTTP Method
+2. `@Path` : URI path for the resources (relative to application root)
+3. `@PathParam, @QueryParam` : extract parameters from PATH or QUERY_STRING
+4. `@Produces, @Consumers` : MIME type of output or input
+
+**Adding Annotations**
+
+```java
+// Address Book POJO without annotation
+import javax.ws.rs.\*;
+
+public class AddressBookService {
+  // GET http://localhost/addressbook
+  public AddressBookService getAddressBookService(){ }
+
+  // GET http://localhost/addressbook/Mr%20Suit
+  public Entry getEntry(String personName){ }
+
+  // DELETE http://localhost/addressbook
+  public void deleteAddressBook() { }
+
+  // DELETE http://localhost/addressbook/Mr%20Suit
+  public void deleteEntry(String personName){ }
+
+  // POST http://localhost/addressbook
+  public void addEntry(Entry entry) { }
+
+  //PUT http://localhost/addressbook/Mr%20Suit
+  public void updateEntry(String name,Entry newEntry) { }
+} // end of class AddressBookService
+
+// -------------------------------------
+// Address Book POJO with annotations
+import javax.ws.rs.\*;
+
+@Path("/addressbook")
+public class AddressBookService {
+  // GET http://localhost/addressbook
+  @GET
+  @Produces("application/xml")
+  public AddressBookService getAddressBookService(){ }
+
+  // GET http://localhost/addressbook/Mr%20Suit
+  @GET
+  @Produces("application/xml")
+  @Path("{name}")
+  public Entry getEntry(@PathParam("name") String personName){ }
+
+  // DELETE http://localhost/addressbook
+  @DELETE
+  public void deleteAddressBook() { }
+
+  // DELETE http://localhost/addressbook/Mr%20Suit
+  @DELETE
+  @Path("{name}")
+  public void deleteEntry(@PathParam("name") String personName){ }
+
+  // POST http://localhost/addressbook
+  @POST
+  @Consumes("application/xml")
+  public void addEntry(Entry entry) { }
+
+  //PUT http://localhost/addressbook/Mr%20Suit
+  @PUT
+  @Path("{name}")
+  @Consumes("application/xml")
+  public void updateEntry(@PathParam("name") String name,Entry newEntry) { }
+} // end of class AddressBookService
+```
+
+**Using JAX-RS in practice**
+
+1. REST WS using JERSEY
+
+- Jersey is the name of the reference implementation for building RESTful Web Service using JAX-RS. There are others such as RESTlet and RESTEasy, which work in similar ways.
+- Jersey is implemented as a set of Java class libraries. If you want to use Jersey for any web applications you create, the application needs access to the Jersey class libraries in its Java CLASSPATH.
+- Jersey need to be in our web container’s Java Classpath → Example, JAR files copied into our web project
+- Need to configure a servlet in web.xml to handle REST requests through Jersey library. web.xml is a configuration file for web applications.
+- Jersey then takes care of the rest, using the annotations from our Java Class
+
+2. REST WS from Patterns
+   - RESTful WS can be configured using Patterns:
+     - Create a Java Web Project in Netbeans
+     - Right click on the project name then select: “Create Restful Web Service from Patterns”
+     - Then select: “Simple Root Resource”
+     - Next provide configuration details like “package, path, service class”
+     - In Demo-2-REST project the REST configuration class “ApplicationConfig.Java” is generated.
+     - In that class, the method “addRestResourceClasses” automatically enable any service class added to the rest package. .
+
+#### Examples:
+
+```java
+package uts.wsd.rest;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import javax.servlet.ServletContext;
+import javax.ws.rs._;
+import javax.ws.rs.core._;
+import javax.xml.bind._;
+import uts.library._;
+
+@Path("/libraryApp")
+public class BookService {
+
+    @Context
+    private ServletContext application;
+
+    private BookApplication getBookApp() throws JAXBException, IOException, Exception {
+        // The web server can handle requests from different clients in parallel.
+        // These are called "threads".
+        //
+        // We do NOT want other threads to manipulate the application object at the same
+        // time that we are manipulating it, otherwise bad things could happen.
+        //
+        // The "synchronized" keyword is used to lock the application object while
+        // we're manipulating it.
+        synchronized (application) {
+            BookApplication bookApp= (BookApplication) application.getAttribute("bookApp");
+            if (bookApp == null) {
+                bookApp = new BookApplication();
+                bookApp.setFilePath(application.getRealPath("WEB-INF/books.xml"));
+                application.setAttribute("bookApp", bookApp);
+            }
+            return bookApp;
+        }
+    }
+    @Path("welcome")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String welcome() {
+        return "Hello and welcome to UTS";
+    }
+
+    @Path("books")
+    @GET
+    @Produces(MediaType.TEXT_XML)
+    public Books getStdudents() throws JAXBException, IOException, Exception{
+        return getBookApp().getBooks();
+    }
+
+    @Path("books/{genre}")
+    @GET
+    @Produces(MediaType.TEXT_XML)
+    public ArrayList<Book> getStdudentbyEmail(@PathParam("genre") String genre) throws JAXBException, IOException, Exception{
+        return getBookApp().getBooks().getMatches(genre);
+    }
+}
+```
+
+- To test the `'welcome()'` method in BooksService service: `http://localhost:8080/Demo-REST/rest/libraryApp/welcome`
+- To test the 'getBooks()' method in BooksService service and fetch all books:
+  `http://localhost:8080/Demo-REST/rest/libraryApp/books`
+- To test the 'getBook()' method in BooksService Service and fetch a book by genre: `http://localhost:8080/Demo-REST/rest/libraryApp/books/history`
+- The `@Context` annotation tells Jersey to automatically "inject" an instance of the JSP application object into this field. This makes it possible for your web service to access methods on the application object such as getAttribute, setAttribute and getRealPath.
