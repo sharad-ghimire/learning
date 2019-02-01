@@ -11,18 +11,17 @@ Big data brings us three subversive ideas to change: all data, not random sampli
 3. is not a causal relationship, but a relationship: we are no longer keen to find a causal relationship, looking for causal relationship is a long habit of mankind, in the era of large data, we no longer need to focus on the causal relationship between things, but should find The relationship between things may not be able to accurately tell us why something happens, but it will remind us that this thing is happening.
 
 **Internet Application Protocols**
-
-| Protocol | Description                                                                   |
+| Protocol | Description |
 | -------- | ----------------------------------------------------------------------------- |
-| HTTP     | Hypertext Transfer Protocol - used to retrieve web pages                      |
-| HTTPS    | Similar to HTTP - but data transfer is encrypted (HTTP- Secure)               |
-| SMTP     | Simple Mail Transfer Protocol - used to send email                            |
-| POP3     | Post Office Protocol - used to retrieve email                                 |
-| IMAP     | Internet Message Access Protocol -such as Gmail, Outlook.com and Yahoo Mail   |
-| FTP      | File Transfer Protocol - used to send and retrieve files                      |
-| Telnet   | Used to login to a remote machine for remote administration of Unix computers |
-| SSH      | Like telnet, used to login but data is encrypted. Secure Shell (SSH)          |
-| NNTP     | Network News Transfer Protocol (NNTP) -used for serving Usenet Posts          |
+| HTTP | Hypertext Transfer Protocol - used to retrieve web pages |
+| HTTPS | Similar to HTTP - but data transfer is encrypted (HTTP- Secure) |
+| SMTP | Simple Mail Transfer Protocol - used to send email |
+| POP3 | Post Office Protocol - used to retrieve email |
+| IMAP | Internet Message Access Protocol -such as Gmail, Outlook.com and Yahoo Mail |
+| FTP | File Transfer Protocol - used to send and retrieve files |
+| Telnet | Used to login to a remote machine for remote administration of Unix computers |
+| SSH | Like telnet, used to login but data is encrypted. Secure Shell (SSH) |
+| NNTP | Network News Transfer Protocol (NNTP) -used for serving Usenet Posts |
 
 **Layered Protocols**
 
