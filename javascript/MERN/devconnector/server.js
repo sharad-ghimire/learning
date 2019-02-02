@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const passport = require('passport'); // Main authentication password
 
 // Routes
 const users = require('./routes/api/users');
@@ -14,9 +15,13 @@ app.use(bodyParser.json());
 
 // DB Config
 require('./config/db-setup');
+// Passport middleware
+app.use(passport.initialize());
+// Everything else we do in passport -> we gonna do it in config file
+// And pass the instance of passport create above to that  file
+require('./config/passport.js')(passport);
 
 // Routes
-app.get('/', (req, res) => res.send('Hello'));
 app.use('/api/users', users);
 app.use('/api/profile', profile);
 app.use('/api/posts', posts);

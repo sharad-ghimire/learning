@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const passport = require('passport');
 
+const KEY = require('../../config/keys').KEY;
 // Models
 const User = require('../../models/User');
 
@@ -19,7 +22,6 @@ router.post('/register', (req, res) => {
     if (user) {
       return res.status(400).json({ email: 'Email already exits' });
     } else {
-      console.log(req.body);
       const avatar = gravatar.url(req.body.email, {
         s: '200', //size
         r: 'pg', // rating
@@ -32,8 +34,6 @@ router.post('/register', (req, res) => {
         avatar,
         password: req.body.password
       });
-
-      console.log(newUser);
 
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -48,5 +48,46 @@ router.post('/register', (req, res) => {
     }
   });
 });
+
+// @route         GET api/users/login
+// @description   Login User / Returning JWT Token
+// @access        public
+router.post('/login', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // Find user by email
+  User.findOne({ email }).then((user) => {
+    if (!user) return res.status(404).json({ email: 'User not found' });
+    // Check for password
+    bcrypt.compare(password, user.password).then((isMatch) => {
+      if (isMatch) {
+        // When user matched!!, Generate the token here and send that token back
+
+        const payload = { id: user.id, name: user.name, avatar: user.avatar }; // JWT Paylaod
+        // Sign Token by passing the payload and key and expires in (maybe days?)
+        jwt.sign(payload, KEY, { expiresIn: 3600 }, (err, token) => {
+          // Bearer
+          res.json({ sucess: true, token: 'Bearer ' + token });
+          // Use Passprt js to verify the token response
+        });
+      } else {
+        return res.status(400).json({ password: 'Password Incorrect' });
+      }
+    });
+  });
+});
+
+// @route         GET api/users/current
+// @description   Return current user
+// @access        private
+// passing password.authenticate('jwt) middleware makes this route protected. Here jwt specifies what strategy to use
+router.get(
+  '/current',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    res.json({ msg: 'Success' });
+  }
+);
 
 module.exports = router;
