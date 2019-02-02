@@ -24,7 +24,7 @@ router.post('/register', (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
 
   if (!isValid) {
-    res.send(400).json(errors);
+    return res.status(400).json(errors);
   }
 
   User.findOne({ email: req.body.email }).then((user) => {
@@ -62,6 +62,8 @@ router.post('/register', (req, res) => {
 // @description   Login User / Returning JWT Token
 // @access        public
 router.post('/login', (req, res) => {
+  const { errors, isValid } = validateRegisterInput(req.body);
+
   const email = req.body.email;
   const password = req.body.password;
 
