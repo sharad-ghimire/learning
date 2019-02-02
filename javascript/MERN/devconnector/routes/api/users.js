@@ -9,6 +9,9 @@ const KEY = require('../../config/keys').KEY;
 // Models
 const User = require('../../models/User');
 
+// Load Input Validation
+const validateRegisterInput = require('../../validation/register');
+
 // @route         GET api/users/test
 // @description   Test users route
 // @access        public
@@ -18,9 +21,16 @@ router.get('/test', (req, res) => res.json({ msg: 'users works' }));
 // @description   Register user
 // @access        public
 router.post('/register', (req, res) => {
+  const { errors, isValid } = validateRegisterInput(req.body);
+
+  if (!isValid) {
+    res.send(400).json(errors);
+  }
+
   User.findOne({ email: req.body.email }).then((user) => {
     if (user) {
-      return res.status(400).json({ email: 'Email already exits' });
+      errors.email = 'Email already exits';
+      return res.status(400).json(errors);
     } else {
       const avatar = gravatar.url(req.body.email, {
         s: '200', //size
@@ -34,7 +44,6 @@ router.post('/register', (req, res) => {
         avatar,
         password: req.body.password
       });
-
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
           if (err) throw err;
@@ -86,7 +95,7 @@ router.get(
   '/current',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    res.json({ msg: 'Success' });
+    res.json({ id: req.user.id, name: req.user.name, email: req.user.email });
   }
 );
 
