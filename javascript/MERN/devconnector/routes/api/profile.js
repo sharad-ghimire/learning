@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 
+const validateProfileInput = require('../../validation/profile');
 // Models
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
@@ -23,6 +24,7 @@ router.get(
     const errors = {};
 
     Profile.findOne({ user: req.user.id })
+      .populate('user', ['name', 'avatar']) // gets all the values form user field  (ref in model)
       .then((profile) => {
         if (!profile) {
           errors.noprofile = 'There is no profile for this user';
@@ -31,6 +33,67 @@ router.get(
         res.json(profile);
       })
       .catch((err) => res.status(404).json(err));
+  }
+);
+
+// @route         POST api/profile
+// @description   Create or Edit user's profile
+// @access        protected
+
+router.post(
+  '/',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateProfileInput(req.body);
+    if (!isValid) return res.status(400).json(errors);
+
+    // Get fields
+    const profileFields = {
+      user: req.user.id,
+      handle: req.body.handle ? req.body.handle : null,
+      company: req.body.company ? req.body.company : null,
+      website: req.body.website ? req.body.website : null,
+      location: req.body.location ? req.body.location : null,
+      bio: req.body.bio ? req.body.bio : null,
+      status: req.body.status ? req.body.status : null,
+      githubusername: req.body.githubusername ? req.body.githubusername : null,
+      skills:
+        typeof req.body.skills != undefined
+          ? req.body.skills.split(',')
+          : undefined
+    };
+    // For socials
+    profileFields.social = {
+      youtube: req.body.youtube ? req.body.youtube : undefined,
+      twitter: req.body.twitter ? req.body.twitter : null,
+      linkedin: req.body.linkedin ? req.body.linkedin : null,
+      facebook: req.body.facebook ? req.body.facebook : null,
+      instagram: req.body.instagram ? req.body.instagram : null
+    };
+
+    Profile.findOne({ user: req.user.id }).then((profile) => {
+      if (profile) {
+        // Update
+        Profile.findOneAndUpdate(
+          { user: req.user.id },
+          { $set: profileFields },
+          { new: true }
+        ).then((profile) => res.json(profile));
+      } else {
+        // Create
+        // Check to see if handle exists, and its not duplicate
+        Profile.findOne({ handle: profileFields.handle }).then((profile) => {
+          if (profile) {
+            errors.handle = 'That handle is already taken';
+            res.status(400).json(errors);
+          }
+          // save profile
+          new Profile(profileFields)
+            .save()
+            .then((profile) => res.json(profile));
+        });
+      }
+    });
   }
 );
 
