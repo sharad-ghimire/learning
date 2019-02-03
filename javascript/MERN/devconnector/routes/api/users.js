@@ -11,6 +11,7 @@ const User = require('../../models/User');
 
 // Load Input Validation
 const validateRegisterInput = require('../../validation/register');
+const validateLoginInput = require('../../validation/login');
 
 // @route         GET api/users/test
 // @description   Test users route
@@ -62,14 +63,20 @@ router.post('/register', (req, res) => {
 // @description   Login User / Returning JWT Token
 // @access        public
 router.post('/login', (req, res) => {
-  const { errors, isValid } = validateRegisterInput(req.body);
+  const { errors, isValid } = validateLoginInput(req.body);
+
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
 
   const email = req.body.email;
   const password = req.body.password;
 
   // Find user by email
   User.findOne({ email }).then((user) => {
-    if (!user) return res.status(404).json({ email: 'User not found' });
+    errors.email = 'User not found';
+    if (!user) return res.status(404).json(errors);
+
     // Check for password
     bcrypt.compare(password, user.password).then((isMatch) => {
       if (isMatch) {
@@ -83,7 +90,8 @@ router.post('/login', (req, res) => {
           // Use Passprt js to verify the token response
         });
       } else {
-        return res.status(400).json({ password: 'Password Incorrect' });
+        errors.password = 'Password incorrect';
+        return res.status(400).json(errors);
       }
     });
   });
