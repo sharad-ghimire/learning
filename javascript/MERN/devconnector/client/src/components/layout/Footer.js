@@ -5,7 +5,7 @@ const Footer = () => {
     <div>
       <hr />
       <footer className='text-white mt-5 p4 text-center'>
-        Copyright &copy; {new Date().getFullYear} Dev Connector.
+        Copyright &copy; {new Date().getFullYear()} Dev Connector.
       </footer>
     </div>
   );
