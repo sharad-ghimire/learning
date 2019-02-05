@@ -9,3 +9,7 @@ UI (react app with ouur componenet) - For example, in our Register component, we
 - Example, in todo application, we may have one `CreateTodo` component and another `ListTodo` component. And we want to access that todo within `ListTodo` component.
 - Instead of passing thing from component to component, in Redux we get single source of truth that we can dispatch to single component.
 - Example, auth state, profile state, posts state, errors state etc in our application and we want to share those state with in our application.
+
+`npm i redux react-redux redux-thunk`
+
+**Thunk** : When we make a ajax request, we want to wait for that request, and then dispatch to our reducer. And redux thunk allows us to do that.
