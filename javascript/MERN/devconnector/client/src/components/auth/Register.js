@@ -137,7 +137,7 @@ Register.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-  auth: state.auth //It comes from or ro0t reducer
+  auth: state.auth //state.auth, where auth comes from our root reducer
 });
 
 export default connect(

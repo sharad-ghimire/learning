@@ -12,11 +12,12 @@ export default function(state = initialState, action) {
   switch (action.type) {
     case TEST_DISPATCH:
       return {
-        // Take everything and add to it -> spread operator (...)
+        // Take everything and add to it -> spread operator (...) mutation
         ...state,
         user: action.payload
       };
-    // We dont chnage the state, we mutate it
+
+    // We dont change the state, we mutate it
     default:
       return state;
   }
