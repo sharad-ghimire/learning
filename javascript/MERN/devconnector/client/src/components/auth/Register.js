@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import classnames from 'classnames';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { registerUser } from '../../actions/authActions';
 
 class Register extends Component {
   constructor() {
@@ -30,20 +33,22 @@ class Register extends Component {
 
     // We dont have to do http://localhost:5000 because we added it as proxy value in package.json
     // We want all of those dsone through Redux actions
-
-    axios
-      .post('/api/users/register', newUser)
-      .then((result) => console.log(result.data))
-      .catch((err) => this.setState({ errors: err.response.data }));
+    // axios
+    //   .post('/api/users/register', newUser)
+    //   .then((result) => console.log(result.data))
+    //   .catch((err) => this.setState({ errors: err.response.data }));
+    this.props.registerUser(newUser);
   };
 
   render() {
     // Pulls errors object from state
     const { errors } = this.state;
+    const { user } = this.props.auth;
 
     return (
       <div>
         <div className='container'>
+          {/* {user ? user.name : null} */}
           <div className='row'>
             <div className='col-md-8 m-auto'>
               <h1 className='display-4 text-center'>Sign Up</h1>
@@ -125,6 +130,19 @@ class Register extends Component {
     );
   }
 }
-export default Register;
+
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired
+};
+
+const mapStateToProps = (state) => ({
+  auth: state.auth //It comes from or ro0t reducer
+});
+
+export default connect(
+  mapStateToProps,
+  { registerUser }
+)(Register);
 
 // Each field has to have its own state within the component

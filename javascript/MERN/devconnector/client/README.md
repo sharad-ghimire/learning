@@ -13,3 +13,5 @@ UI (react app with ouur componenet) - For example, in our Register component, we
 `npm i redux react-redux redux-thunk`
 
 **Thunk** : When we make a ajax request, we want to wait for that request, and then dispatch to our reducer. And redux thunk allows us to do that.
+
+**Action** : Everything we do is gonna be an action. For example, when we REGISTER_USER that will be an action.
