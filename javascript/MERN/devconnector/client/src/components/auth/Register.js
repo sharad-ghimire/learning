@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -18,6 +18,11 @@ class Register extends Component {
     // this.onChange = this.onChange.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    // Make it a component state
+    if (nextProps.errors) this.setState({ errors: nextProps.errors });
+  }
+
   onChange = (e) => {
     this.setState({ [e.target.name]: e.target.value });
   };
@@ -30,13 +35,6 @@ class Register extends Component {
       password: this.state.password,
       password2: this.state.password2
     };
-
-    // We dont have to do http://localhost:5000 because we added it as proxy value in package.json
-    // We want all of those dsone through Redux actions
-    // axios
-    //   .post('/api/users/register', newUser)
-    //   .then((result) => console.log(result.data))
-    //   .catch((err) => this.setState({ errors: err.response.data }));
     this.props.registerUser(newUser);
   };
 
@@ -133,11 +131,13 @@ class Register extends Component {
 
 Register.propTypes = {
   registerUser: PropTypes.func.isRequired,
-  auth: PropTypes.object.isRequired
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state) => ({
-  auth: state.auth //state.auth, where auth comes from our root reducer
+  auth: state.auth, //state.auth, where auth comes from our root reducer
+  errors: state.errors
 });
 
 export default connect(
