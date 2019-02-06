@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
+
 import { withRouter } from 'react-router-dom';
+
 import { connect } from 'react-redux';
 import { registerUser } from '../../actions/authActions';
 
@@ -41,6 +43,7 @@ class Register extends Component {
       password: this.state.password,
       password2: this.state.password2
     };
+    // this.props.histroy, use this so that we can do this within the authActions
     this.props.registerUser(newUser, this.props.histroy);
   };
 
