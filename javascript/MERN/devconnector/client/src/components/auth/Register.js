@@ -19,9 +19,14 @@ class Register extends Component {
     // this.onChange = this.onChange.bind(this);
   }
 
+  // This runs when our component recives new props
   componentWillReceiveProps(nextProps) {
-    // Make it a component state
-    if (nextProps.errors) this.setState({ errors: nextProps.errors });
+    // Make it a component state so that we can use errors from state.
+    // This way we get our errors props from redux state, it then put into props from mapStateToProps and then only we receive new props and there is errors in  that props we gonna set it to the component state.
+    if (nextProps.errors)
+      this.setState({
+        errors: nextProps.errors
+      });
   }
 
   onChange = (e) => {
@@ -42,12 +47,11 @@ class Register extends Component {
   render() {
     // Pulls errors object from state
     const { errors } = this.state;
-    const { user } = this.props.auth;
+    // We can also get the errors from this.props.state, which we get from mapStateToProps but instead we used componentWillReceiveProps(nextProps) life cycle method so that that props we got gets mapped to state now,
 
     return (
       <div>
         <div className='container'>
-          {/* {user ? user.name : null} */}
           <div className='row'>
             <div className='col-md-8 m-auto'>
               <h1 className='display-4 text-center'>Sign Up</h1>
@@ -138,7 +142,7 @@ Register.propTypes = {
 
 const mapStateToProps = (state) => ({
   auth: state.auth, //state.auth, where auth comes from our root reducer
-  errors: state.errors
+  errors: state.errors // Get errors from our store and now we can access that fom this.props.errors
 });
 
 export default connect(
