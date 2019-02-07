@@ -5,6 +5,7 @@ import { PropTypes } from 'prop-types';
 import { connect } from 'react-redux';
 
 class Landing extends Component {
+  // If user is logged in it, it will redirect to /dashboard
   componentDidMount() {
     if (this.props.auth.isAuthenticated) this.props.history.push('/dashboard');
   }
