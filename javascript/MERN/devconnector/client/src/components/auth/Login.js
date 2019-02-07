@@ -30,6 +30,11 @@ class Login extends Component {
     this.props.loginUser(loggedUser);
   };
 
+  // This lifecycle method checks if the user is login or not, if logged in it will redirect to /dashboard
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) this.props.history.push('/dashboard');
+  }
+
   componentWillReceiveProps(nextProps) {
     // Check if the user is authenticated or not
     if (nextProps.auth.isAuthenticated) this.props.history.push('/dashboard');
@@ -95,7 +100,7 @@ class Login extends Component {
 }
 
 Login.propTypes = {
-  loginUser: PropTypes.func.required,
+  loginUser: PropTypes.func.isRequired, //actions are functions
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
 };
@@ -107,5 +112,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
   mapStateToProps,
-  { loginUser }
+  { loginUser } //function from our action file
 )(withRouter(Login));

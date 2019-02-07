@@ -6,9 +6,10 @@ import { GET_ERRORS, SET_CURRENT_USER } from './types';
 
 // Register User ACTION
 export const registerUser = (userData, history) => (dispatch) => {
+  console.log(history);
   axios
     .post('/api/users/register', userData)
-    .then((result) => history.push('/login'))
+    .then((res) => history.push('/login'))
     .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response.data }));
 };
 
@@ -40,7 +41,17 @@ export const loginUser = (userData) => (dispatch) => {
     .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response.data }));
 };
 
-// Set logged in user
+// Set logged in user (using this App.js to check in every page reload that user is logged in or not.)
 export const setCurrentUser = (decoded) => {
-  return { type: SET_CURRENT_USER, payload: decode };
+  return { type: SET_CURRENT_USER, payload: decoded };
+};
+
+// Logout action
+export const logoutUser = () => (dispatch) => {
+  // Remove the token from localStorage
+  localStorage.removeItem('jwtToken');
+  // Remove the auth header for future request
+  setAuthTokenToHeader(false);
+  // Set the current user to emty object which will also set isAuthenticated to false
+  dispatch(setCurrentUser({}));
 };

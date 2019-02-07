@@ -1,4 +1,4 @@
-import { createStore, combineReducers, applyMiddleware, compose } from 'redux'; // This createStore takes in multiple reducer (like auth reducer, profile reducer etc.)
+import { createStore, applyMiddleware, compose } from 'redux'; // This createStore takes in multiple reducer (like auth reducer, profile reducer etc.)
 // combineReducer combines all of our reducer
 import thunk from 'redux-thunk';
 import rootReducer from './reducers/index';

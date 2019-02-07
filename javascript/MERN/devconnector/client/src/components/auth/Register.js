@@ -20,6 +20,9 @@ class Register extends Component {
     };
     // this.onChange = this.onChange.bind(this);
   }
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) this.props.history.push('/dashboard');
+  }
 
   // This runs when our component recives new props
   componentWillReceiveProps(nextProps) {
@@ -44,7 +47,7 @@ class Register extends Component {
       password2: this.state.password2
     };
     // this.props.histroy, use this so that we can do this within the authActions
-    this.props.registerUser(newUser, this.props.histroy);
+    this.props.registerUser(newUser, this.props.history);
   };
 
   render() {
