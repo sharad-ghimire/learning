@@ -20,6 +20,7 @@ import EditProfile from './components/edit-profile/EditProfile';
 import AddExperience from './components/add-credential/AddExperience';
 
 import { clearCurrentProfile } from './actions/profileActions';
+import AddEducation from './components/add-credential/AddEducation';
 
 // Check for token in every single page request (therefore inside App.js)
 if (localStorage.jwtToken) {
@@ -78,6 +79,13 @@ class App extends Component {
                   exact
                   path='/add-experience'
                   component={AddExperience}
+                />
+              </Switch>
+              <Switch>
+                <PrivateRoute
+                  exact
+                  path='/add-education'
+                  component={AddEducation}
                 />
               </Switch>
             </div>
