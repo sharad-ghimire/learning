@@ -19,6 +19,7 @@ class CreateProfile extends Component {
       handle: '',
       company: '',
       website: '',
+
       location: '',
       status: '',
       skills: '',
