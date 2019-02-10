@@ -24,6 +24,14 @@ export const createProfile = (profileData, history) => (dispatch) => {
     .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response.data }));
 };
 
+// Add Experience
+export const addExperience = (newExp, history) => (dispatch) => {
+  axios
+    .post('/api/profile/experience', newExp)
+    .then((res) => history.push('/dashboard'))
+    .catch((err) => dispatch({ type: GET_ERRORS, payload: err.response.data }));
+};
+
 // Profile Loading
 export const setProfileLoading = () => {
   return {

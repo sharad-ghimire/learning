@@ -164,7 +164,7 @@ router.post(
     const { errors, isValid } = validateExperienceInput(req.body);
     if (!isValid) return res.status(400).json(errors);
 
-    Profile.findOne({ user: require.user.id }).then((profile) => {
+    Profile.findOne({ user: req.user.id }).then((profile) => {
       const newExp = {
         title: req.body.title,
         company: req.body.company,
