@@ -17,7 +17,6 @@ module.exports = (passport) => {
       // This will only be used if we specify it in certain route
       User.findById(jwt_payload.id).then((user) => {
         if (user) return done(null, user);
-        console.log(user);
         return done(null, false);
       });
     })

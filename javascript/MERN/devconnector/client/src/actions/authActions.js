@@ -14,6 +14,7 @@ export const registerUser = (userData, history) => (dispatch) => {
 
 // Above in catch() we used dispatch. Thats a thunk fucntion because, getting error is async task so we are not going to directly return  the type and pyload there.
 
+
 // From within the component but not from action, so we need to pass histroy from our component and withRouter() helps us to do that. Simply wrap it with the component. withRouter(Register)
 // this.props.histroy.push('/dashboard)
 
@@ -54,4 +55,3 @@ export const logoutUser = () => (dispatch) => {
   // Set the current user to emty object which will also set isAuthenticated to false
   dispatch(setCurrentUser({}));
 };
-
