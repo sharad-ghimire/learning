@@ -6,7 +6,8 @@ export default (sequelize, dataType) => {
   Team.associate = (models) => {
     Team.belongsToMany(models.User, {
       through: 'member',
-      foreignKey: 'teamId'
+      // teamID to match graphQL schema and team_id for sql select
+      foreignKey: { name: 'teamId', field: 'team_id' }
     });
     Team.belongsTo(models.User, {
       foreignKey: 'owner'
