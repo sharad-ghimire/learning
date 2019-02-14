@@ -5,8 +5,9 @@ import { makeExecutableSchema } from 'graphql-tools';
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
+import models from './models';
 
-export const schema = makeExecutableSchema({ typeDefs, resolvers });
+const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
 const GRAPHQL_URL = '/graphql';
@@ -15,4 +16,6 @@ const GRAPHQL_URL = '/graphql';
 app.use(GRAPHQL_URL, bodyParser.json(), graphqlExpress({ schema }));
 app.use('/graphiql', graphiqlExpress({ endpointURL: GRAPHQL_URL }));
 
-app.listen(8080);
+models.sequelize.sync().then(() => {
+  app.listen(8080);
+});
