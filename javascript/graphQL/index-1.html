@@ -1,0 +1,158 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Unknown </title></head><body>
+<h1 id="client-side-graphql-with-apollo">Client Side GraphQl with Apollo</h1>
+<h3 id="graphql-vs-rest-vs-rpc-vs-soap">GraphQL vs REST vs RPC vs SOAP</h3>
+<ol>
+<li>SOAP: Entires and verbs in URL</li>
+<li>RPC: Remote Procedual Call, uses verbs (like a function). But need different RPC call for each operation so hard to maintain.</li>
+<li>REST: nouns like <code>/apples</code> and modify using verbs like GET, PUT and POST. But everytime, while working on client we have to call or modify backend so causes delays and overheads and is no ideal for testing.</li>
+<li>GraphQL: Allows to have one endpoint. Schema helps for versioning. Client can request data for the specific page and not gonna get extra data i.e. client controls the data and structure. It can also aggregate data from single calls. GraphQL is simply a protocol on top of HTTP/S and TCP/IP. It only creates POST request containing the information about the data we need. Similar to SQL, allows to modify data and still uses JOSN and can be acessed using only one url.</li>
+</ol>
+<h3 id="apollo">Apollo</h3>
+<p>Graphql can be used with a HTTP Client like fetch, axios or superagent request and it just needs payload, url and post method. Apollo is simply an graphql client which has cacheing, formatting the query and http client build in. In other hand, <em>relay-modern</em> has preprocessing (process query ahead of time, so extra build time). It gives better optimization. Whereas in Apollo, we have our React Component and graphql query at the buttom and we can bind those two and create a new component. And we can use that component anywhere and data will be fetched automatically with cacheing and auto UI update.</p>
+<h3 id="graphcool">graph.cool</h3>
+<p>It is an SaaS (BaaS to be precise) that allow us to connect to backend without our own server.</p>
+<ul>
+<li>Schema Editor</li>
+<li>Query Playground</li>
+<li>Open Source CLI Tool</li>
+<li>Robust DB</li>
+<li>Also run locally with docker container</li>
+</ul>
+<h2 id="graphql-architecture">GraphQL Architecture</h2>
+<h4 id="typical-web-application">Typical Web Application</h4>
+<p><img alt="Typical Web Application" src="traditional-1.png"/></p>
+<h4 id="express-and-node-backend">Express and Node Backend</h4>
+<p><img alt="Express and GrapQL" src="express-graphql-1.png"/></p>
+<h4 id="query-and-schema">Query and Schema</h4>
+<p>```graphql
+<!-- Schema -->
+type Product @model{
+    id: ID! @isUnique
+    inStoreCount: Int
+    name: String! @defaultValue(value: "Default Name")
+    description: String
+    additionalDescription: Json
+    createdAt: DateTime!
+    release: DateTime
+}
+<!-- Query -->
+query {
+  allProducts {
+    additionalDescription
+    createdAt
+    description
+    inStoreCount
+  }
+}
+<!-- Result from above query -->
+{
+  "data": {
+    "allProducts": [
+      {
+        "additionalDescription": {
+          "imageUrl": "https://images.unsplash.com/photo-152.png"
+        },
+        "createdAt": "2019-01-27T06:19:42.000Z",
+        "description": "Tero Bau version 2",
+        "inStoreCount": 11
+      },
+      {
+        "additionalDescription": {
+          "imageUrl": "https://i.pinimg.com/originals/c6/a2/89.jpg"
+        },
+        "createdAt": "2019-01-27T06:19:50.000Z",
+        "description": "Tero Bau",
+        "inStoreCount": 22
+      }
+    ]
+  }</p>
+<p>```</p>
+<h3 id="fetching-data-from-a-graphql-backend">Fetching data from a graphql backend</h3>
+<h5 id="curl">cURL</h5>
+<p><code>bash
+curl 'https://api.graph.cool/simple/v1/cjreif5524tfb0194zw60vjbu'
+  -H 'Authorization: Bearer YOUR_AUTH_TOKEN'
+  -d '{"query":""{allProducts{additionalDescriptioncreatedAtdescriptioninStoreCount}}""}'</code></p>
+<h5 id="node-with-graphql-request">Node with graphql-request</h5>
+<p><code>$ npm install graphql-request</code></p>
+<p>```javascript
+const GraphQLClient = require("graphql-request").GraphQLClient;</p>
+<p>const client = new GraphQLClient(
+  "https://api.graph.cool/simple/v1/cjreif5524tfb0194zw60vjbu",
+  {
+    headers: {
+      Authorization: "Bearer YOUR_AUTH_TOKEN"
+    }
+  }
+);</p>
+<p>function getItem() {
+  return client.request(`
+    {
+      allProducts {
+        additionalDescription
+        createdAt
+        description
+        inStoreCount
+      }
+    }</p>
+<p>`);
+}
+```</p>
+<h5 id="node-with-fetch">Node with fetch</h5>
+<p><code>$ npm install isomorphic-fetch es6-promise</code></p>
+<p>```javascript
+require("es6-promise").polyfill();
+require("isomorphic-fetch");</p>
+<p>function getItems() {
+  return fetch("https://api.graph.cool/simple/v1/cjreif5524tfb0194zw60vjbu", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json"
+      //'Authorization': 'Bearer YOUR_AUTH_TOKEN'
+    },
+    body:
+      '{"query":"{allProducts{additionalDescriptioncreatedAtdescriptioninStoreCount}}"}'
+  });
+}
+```</p>
+<h5 id="browser-with-graphql-request">Browser with graphql-request</h5>
+<p>```javascript
+import { GraphQLClient } from "graphql-request";</p>
+<p>const client = new GraphQLClient(
+  "https://api.graph.cool/simple/v1/cjreif5524tfb0194zw60vjbu",
+  {
+    headers: {
+      Authorization: "Bearer YOUR_AUTH_TOKEN"
+    }
+  }
+);</p>
+<p>function getItem() {
+  return client.request(`
+    {
+      allProducts {
+        additionalDescription
+        createdAt
+        description
+        inStoreCount
+      }
+    }</p>
+<p>`);
+}
+```</p>
+<p><em>For Accessing Token, go to setting and then authentication and create auth there.</em></p>
+<h3 id="graphql-types-relationships">GraphQL Types relationships</h3>
+<p>```graphql
+type Product @model {
+  ...
+  orders: [Order!]! @relation(name: "OrderOnProduct")
+  ...
+}</p>
+<!-- Many to Many Relation -->
+
+<p>type Order @model {
+  customerEmail: String!
+  id: ID! @isUnique
+  products: [Product!]! @relation(name: "OrderOnProduct")
+}
+```</p>
+</body></html>
