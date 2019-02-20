@@ -89,7 +89,7 @@ app.use(
             user.createdEvents.push(event);
             return user.save();
           })
-          .then((result) => {
+          .then(() => {
             return createdEvent;
           })
           .catch((err) => console.log(err));
