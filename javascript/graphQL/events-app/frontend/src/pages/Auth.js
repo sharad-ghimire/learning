@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 
+import AuthContext from '../context/auth-context';
+
 import './Auth.css';
 
 class Auth extends Component {
   state = {
     isLogin: true
   };
+
+  static contextType = AuthContext;
   constructor(props) {
     super(props);
     this.emailEl = React.createRef();
@@ -68,7 +72,15 @@ class Auth extends Component {
         }
         return res.json();
       })
-      .then((data) => {})
+      .then((resData) => {
+        if (resData.data.login.token) {
+          this.context.login(
+            resData.data.login.token,
+            resData.data.login.userId,
+            resData.data.login.tokenExpiration
+          );
+        }
+      })
       .catch((err) => console.log(err));
   };
   render() {
