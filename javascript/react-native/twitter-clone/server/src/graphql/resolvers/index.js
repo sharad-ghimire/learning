@@ -1,4 +1,4 @@
-const TweetResolvers = require("./tweet-resolvers");
+const TweetResolvers = require('./tweet-resolvers');
 
 export default {
   Query: {
