@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProductControl extends StatelessWidget {
-  final Function addProducts; //passed function
+  final Function addProducts; //passed function // data we work here should be immutable
   ProductControl(this.addProducts);
 
   @override
