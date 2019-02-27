@@ -358,10 +358,178 @@ try {
 } catch(e) {
   print(e.errorMessage());
 }
-
 ```
 
 ## OOPS Concepts
+
+```dart
+void main() {
+  var student1 = new Student();
+  var student2 = Student(); // new is optional
+
+  student1.id = 22;
+  student1.name = "Sharad";
+
+  print("${student2.id} and ${student2.name}");
+  student1.study();
+  student1.sleep();
+}
+
+// Define states (properties) and behaviour of a Student
+class Student {
+  int id; // instance (Field) variable, default value is null
+  String name;
+
+  void study() => print('${this.name} is now studying!');
+  void sleep() => print('${this.name} is now sleeping');
+}
+```
+
+**Constructor**
+
+Constructor doesnot have any return type. It can be Default, Named and Parametersied. Default and Named constructor in same class is not allowed. We can have as many named constructor as we want to.
+
+```dart
+void main() {
+  var student1 = Student(); // Calling default constructor
+  student1.id = 2;
+  student1.name = "Sharad";
+
+  var student2 = Student(2, "Sharad"); // Calling Parameterized constructor
+
+  var student3 = Student.myCustomConstructor(); // Calling Named constructor
+  var student4 = Student.anotherConstructor(2, "Ram");
+}
+
+class Student {
+  int id;
+  String name;
+
+  Student(){} // Default Constructor (Before creating any object from this class, code inside this contructor will run)
+
+  Student(int id, String name){ // Parameterized constructor
+    this.id = id;
+    this.name = name;
+  }
+
+  Student(this.id, this.name); // Shortcut for Parameterized constructor
+
+  Student.myCustomConstructor()) {} // Named constructor
+  Student.anotherConstructor(this.id, this.name) {} // Named Parameterized constructor
+
+  void study() => print('${this.name} is now studying!');
+  void sleep() => print('${this.name} is now sleeping');
+}
+
+```
+
+**Getter and Setter**
+
+```dart
+void main(){
+  var student = Student();
+  student.name = "Peter";    // setter (default)
+  print(student.name);       // getter (default)
+
+  student.percentage = 438; // calling custom setter to set value
+  print(student.percentage);
+}
+
+class Student {
+  String name; // Instance variable,with default getter and setter
+  double _percent; // Private Instance variable for its own library
+
+  // Instance variable with custom setter
+  void set percentage(double marksSecured) => _percent = (marksSecured / 500)*100;
+
+  // Instance variable with custom getter
+  double get percentage => _percent;
+  }
+}
+```
+
+**Inheritance**
+
+Inheritance is a mechanism in which one object acquires oproperties of its paarent class object. Advantage: Code reusability and clean code. Super class of any class is `Object`, which provides default implementation of `toString()` (returns the String represnetation of the object) and `hasCode` getter, which returns the hash code of an object. Also, `operator ==`, to compare two objects.
+
+Commonly used inheritance:
+
+- Single Inheritance : One class inheriting from another class.
+- Multi-level Inheritance : One class inherit from another which in turn inherit from another class.
+- Hierarchial Inheritance : Two classes inherit from one class.
+
+Method Overridding is a mechanism by which the child class redefines a method in its parent class. Although, compiler gives more priority to that of child class.
+
+```dart
+void main() {
+  var dog = Dog();
+  dog.color = "Black";
+
+  var cat = Cat();
+  cat.color = "White";
+}
+
+class Animal {
+  String color;
+  void eat() => print("Eat!");
+}
+
+class Dog extends Animal{
+  String breed;
+
+  void bark() => print("Bark!");
+
+  // method overriding (signature should be the same as that of parent)
+  void eat() => {
+    super.eat();   // Also execute this method of parent class.
+    print("Dog is eating!!");
+  }
+}
+
+class Cat extends Animal {
+  String color;
+  String age;
+
+  void meow() => print("MEOW !");
+}
+
+```
+
+**Using Constructor during Inheritance**
+
+- By default, a constructor in a subclass calls the superclass's no-argument constructor.
+- Parent class constructur is always called before child class constructor.
+- If the default constructor is missing in Parent class, then we must manually call one of the constructors in super class.
+
+```dart
+void main(){
+  var dog1 = Dog("Lab", "Pug");
+}
+
+class Animal {
+  String color;
+  Animal(String color){ this.color = color; }
+  Animal.myAnimal(){}
+}
+
+class Dog extends Animal {
+  String breed;
+
+  // There is implicity call to parent class contructor
+  // If we dont want call super, then make sure the parent constructor is default
+  Dog(String breed, String color) :super(color)) {
+    this.breed = breed;
+  }
+  Dog.myNameConstructor() : super.myAnimal() { }
+}
+
+```
+
+**Abstract Classes and Methods**
+
+**Interface**
+
+**Static Methods and Variables**
 
 ## Functional Programming
 
