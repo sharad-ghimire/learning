@@ -503,7 +503,8 @@ class Cat extends Animal {
 
 ```dart
 void main(){
-  var dog1 = Dog("Lab", "Pug");
+  var dog1 = Dog("Lab", "White");
+  var dag2 = Dog();
 }
 
 class Animal {
@@ -517,20 +518,302 @@ class Dog extends Animal {
 
   // There is implicity call to parent class contructor
   // If we dont want call super, then make sure the parent constructor is default
-  Dog(String breed, String color) :super(color)) {
+  Dog(String breed, String color) :super(color) {
     this.breed = breed;
   }
-  Dog.myNameConstructor() : super.myAnimal() { }
+
+  Dog.myNamedConstructor() : super.myAnimal() { }
 }
 
 ```
 
 **Abstract Classes and Methods**
 
+To make a method abstract, use `;` semicolon instread of method body. Abstract method can only exist with Abstract class. We need to override Abstract methods in sub-class.
+
+For abstract class, use `abstract` keyword to declare Abstract Class. They can have abstract methos, normal methods and instance variables as well. The abstract variable cannot be instantiated, we cannot create objects.
+
+```dart
+void main() {
+  var rect = Rectangle();
+  rect.draw();
+
+}
+
+abstract class Shape {
+  String x; // Can also define instance variable
+  void draw(); // abstract method
+  // We can also define normal functions as well
+}
+
+// Whenever we extend a abstract class, then its mendatory to override that class's abstract methods
+class Rectangle extends Shape {
+
+  void draw() =>   print("Overrided!!");
+}
+```
+
 **Interface**
+
+Dart does not have any special syntax to declare Interface. And interface in dart is a normal class. An interface is used when we need concrete implementation of all of its functions within it's sub class. It is mandatory to override all methods in the implementing class. Also, we can `implement` multiple classes but we caannot `extend` multiple classes during inheritance.
+
+```dart
+void main(){
+  var tv = Tv();
+  tv.volumeUp();
+}
+
+class Remote {
+  void volumeUp() => print("+++++");
+  void volumeDown() => print("----");
+}
+
+class AnotherClass {
+  void justAnotherMethod(){}
+}
+// Make remote class behave as if it is an interface
+// Now, Remote acts as Interface
+// We can implement multiple class in interface but not in inheritance
+class Tv implements Remote, AnotherClass {
+  void volumeUp() => print("Tv +++");
+  void volumeDown() => print("Tv ---");
+
+   void justAnotherMethod(){}
+}
+
+```
 
 **Static Methods and Variables**
 
+- Static variables are also known as class variables and static methods are also known as class methods.
+- Static variables are **lazily** initialized i.e they are not initialized until they are used in program. So they consume memory only when they are used.
+- Static methods has nothing to do with class object or instance. We cannot use `this` keyword within a Static method.
+- From a Static method, we can only access static method and static variables. But we cannot access Normal Instance Variables and methods of the class.
+
+```dart
+void main(){
+  var circle = Circle();
+  //circle.pi; // Error
+  //circle.calculateArea(); // Error
+
+  print(Circle.pi); // Consume memory only once
+  Circle.calculateArea();
+}
+
+class Circle {
+  static const double pi = 3.14;
+  static int maxRadius = 5;
+
+  String color;
+
+  static void calculateArea(){
+    print("Some code");
+    anotherFunction(); //Not allowed to call instance functions
+    this.color = "Some"; // We cannot use 'this' and even cannot access instance variables
+  }
+
+  void anotherFunction(){
+    print("Some code");
+    Circle.calculateArea();
+    this.color = "Red";
+    print(pi);
+    print(Circle.maxRadius);
+  }
+}
+
+```
+
 ## Functional Programming
 
+**Lambda Expression** : A function without a name. Also known as anonymous function or lambda. NOTE: A Function in Dart is an object. `Function addNumbers = // Some value;`
+
+```dart
+void main(){
+  addTwoNumbers(2,5);
+  print(multiplyByFour(4));
+}
+
+// Normal Function
+void addMyNumbers(int a, int b){
+  var sum = a + b;
+  print(sum);
+}
+
+// Anonymous Function
+(int a ) {
+  print a;
+}
+
+// Lambda Function
+Function addTwoNumbers =  (int a, int b) {
+  var sum = a + b;
+  print(sum);
+}
+
+// Lambda Function with fat arrow
+var multiplyByFour = (int num) => num * 4;
+
+```
+
+**Higher Order Function** : Function that can accept another function as a parameter or can return another function.
+
+```dart
+void main(){
+  someOtherFunction("Hello", (a, b) => print(a + b));
+
+  var myFunc = taskToPerform();
+  myFunc(10); // 10 * 4 = 40
+}
+
+//Example one: Accepts function as parameter
+void someOtherFunction(String message, Function myFunction){
+  print(message);
+  myFunction(2, 4);
+}
+
+// Example two: Returns a function
+Function taskToPerform() {
+  Function multiplyFour = (int number) => number * 4;
+  return multiplyFour;
+}
+```
+
+**CLosures** : A special function within a closure we can mutate (modify) the values of variables present in the parent scope.
+
+```dart
+void main(){
+  // Def 1: A closure is a function that has access to the parent scope, even after the scope has closed.
+  String message = 'Good!';
+  Function showMessage = () {
+    message = 'Very Good!';
+    print(message);
+  };
+
+  showMessage(); // Prints 'Very Good'!
+
+  // Def 2: A closure is a function object that has access to variables in its lexical scope, even when the function is used outside of its original scope.
+  Function talk = () {
+    String msg = "Hi!";
+    Function say = () {
+      msg = "Hello";
+      print(msg);
+    };
+    return say();
+  };
+
+  var speak = talk();
+  speak(); // prints Hello
+  //say() function is actually presents inside the scope of talk function and thats is being used outside of the talk()
+}
+
+```
+
 ## Dart Collection Framework
+
+**List** : In Dart, Array is known as List. Ordered collection (Elements are ordered in sequence).
+
+- Fixed-length list : Length once defined cannot be changed.
+- Growable list : Length is dynamic
+
+```dart
+void main(){
+  // Index: Start from 0
+  // Fixed length list
+  List<int> numberList = List(5);
+  numberList[0] = 11;
+
+
+  // Dynamic List
+  List<int> numberList = List(); // Method 1
+  List<String> countries = ["Nepal", "China"];  // Method 2
+
+
+  // Operations Not supported in Fixed length list
+  numberList.add(11);
+  numberList.add(21);
+  numberList.remove(11);
+  numberList.removeAt(0);
+  numberList.clear();
+
+  numberList.forEach((element) => print(element));  // Using Lambda
+  for(int element in numberList){
+    print(element);
+  }
+}
+```
+
+**Set** : Unordered collection of unique items. We cannot get element by index, since the items are unordered.
+HashSet is implementation of unordered Set and it is based on hash-table based Set implementation.
+
+```dart
+void main(){
+  // Method 1: From a list
+  Set<String> countries = Set.from(["USA", "INDIA", "NEPAL"]);
+  countries.add("Australia");
+
+  // Method 2: Using Constructor
+  Set<int> numbersSet = Set();
+  numbersSet.add(12);
+  numbersSet.add(12);       // Duplicate entries are ignored
+
+  numbersSet.contains(12);  // returns true if th element is found in set
+  numbersSet.remove(12); // returns true if the element was found and deleted
+  numbersSet.length;
+  numbersSet.isEmpty;
+  numbersSet.clear();
+
+  numbersSet.forEach((element) => print(element));
+}
+```
+
+**Maps** : It is unordered collection of key-value pair. Key-value can be of any object type. Each key in a map should be unique. Commonly called as hash or dictionary. Size of map is not fixed, it can increase or decrease as per the number of elements.
+
+HashMap is a implementation of Map, based on hash-table.
+
+```dart
+void main(){
+
+  // Method 1
+  Map<String, int> code = {
+    "Nepal": 977,
+    "Aus": 61
+  };
+
+  // Method 2
+  Map<String, String> fruits = Map();
+  fruits["apple"] = "Red";
+
+  // Operations
+  fruits.containsKey("apple");
+  fruits.update("apple", (value) => "green");
+  fruits.remove("apple");
+
+  for(String key in fruits.keys){
+    print(key);
+  }
+  for(String value in fruits.values){
+    print(value);
+  }
+  fruits.forEach((key, value) => print("key $key and value $value"));
+}
+
+```
+
+## Callable Class
+
+When Dart class is called like a function. Implement `call()` function.
+
+```dart
+void main(){
+  var personOne = Person();
+  var msg = personOne(21, "Sharad");
+  print(msg);
+}
+
+class Person(){
+
+  String call(int age, String name){
+    return "My name is $name and age is $age."
+  }
+}
+```
