@@ -951,7 +951,7 @@ class _State extends State<MyApp>{
 class Choice {
   final String title;
   final IconData icon;
-  
+
   Choice({this.icon, this.title})
 }
 
@@ -962,7 +962,7 @@ class _State extends State<MyApp> with SingleTickerProviderStateMixin {
     const Choice(title: 'Car', icon: Icons.directions_car),
     const Choice(title: 'Bicycle', icon: Icons.directions_bike),
     const Choice(title: 'Boat', icon: Icons.directions_boat),
-    const Choice(title: 'Train', icon: Icons.directions_railway),    
+    const Choice(title: 'Train', icon: Icons.directions_railway),
     const Choice(title: 'Walk', icon: Icons.directions_walk),
   ];
 
