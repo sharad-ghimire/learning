@@ -1,4 +1,6 @@
-## Hello World
+# Basics
+
+### Hello World
 
 ```dart
 import 'package:flutter/material.dart';
@@ -35,7 +37,7 @@ class _State extends State<MyApp> {
 
 ```
 
-## Buttons
+### Buttons
 
 ```dart
 class _State extends State<MyApp> {
@@ -91,7 +93,7 @@ class _State extends State<MyApp> {
 
 ```
 
-## Input Widgets
+### Input Widgets
 
 ```dart
 import 'dart:async'; // Aysnc for date picker
@@ -221,7 +223,7 @@ class _State extends State<MyApp> {
 
 ```
 
-## Scaffold
+### Scaffold
 
 **AppBar**
 
@@ -376,7 +378,7 @@ Widget build(BuilContext context){
 }
 ```
 
-## Notification
+### Notification
 
 **Bottom Sheet**
 
@@ -537,7 +539,7 @@ class _State extends State<MyApp>{
 
 ```
 
-## Layouts
+### Layouts
 
 **Columns and Rows**
 
@@ -684,3 +686,311 @@ class _State extends State<MyApp>{
 
 
 ```
+
+# Intermediate
+
+### Widgets
+
+**Tooltips**
+
+```dart
+class _State extends State<MyApp>{
+
+  String _value = 'Nothing';
+  void _onPressed() => setState(() => _value = new DateTime.now().toString());
+
+  @override
+  Widget build(BuildContext context){
+    return new Scaffold(
+      //..
+      new Text(_value),
+      new IconButton(
+        icons: Icon(Icons.timer),
+        onPressed: _onPressed,
+        tooltip: 'Click me',
+      )
+    ),
+  }
+}
+
+```
+
+**Chips, keys and children**
+
+```dart
+class _State extends State<MyApp>{
+
+  int counter = 0;
+  List<Widget> _list = new List<Widget>();
+
+  @override
+  void initState(){
+    for(int i = 0; i < 5; i++){
+      _list.add(_newItem(i)); // Because this is a initState() we dont have to setState()
+    }
+  }
+  void _onClicked() {
+    Widget chip = _newItem(counter);
+    setState(() => _list.add(child));
+  }
+
+  Widget _newItem(int i){
+    Key key = new Key('items_$i');
+    Container child = new Container(
+      key: key, // keys allow us to reference that object (like an identifier)
+      // we need key because we have a widget tree and need to access a child in that widget tree. So, when we call this key, we are referencing this Container()
+      padding: new EdgeInsets.all(10.0),
+      child: new Chip(
+        label: new Text('${i} Name here'),
+        deleteIconColor: Colors.red,
+        deleteButtonTooltipMessage: 'Delete',
+        onDeleted: () => _removeItem(key),
+        avatar: new CircleAvatar(
+          backgroundColor: Colors.grey.shade800,
+          child: new Text(i.toString())
+        ),
+      )
+    );
+    counter++;
+    return child;
+  }
+
+  void _removeItem(Key key){
+    for(int i = 0; i < _list.length; i++){
+      Widget child = _list.elementAt(i);
+      if(child.key == key){
+        setState(() => _list.removeAt(i));
+        print('Removing ${key.toString()}');
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context){
+    return new Scaffold(
+      floatingActionButton: new FloatingActionButton(
+        onPressed: _onClicked,
+        child: new Icon(Icons.add),
+      )
+      body: new Container(
+        child: new Column(
+          children: _list, // our list of Widgets
+        )
+      ),
+    ),
+  }
+}
+```
+
+**Slider and Indicators**
+
+```dart
+class _State extends State<MyApp>{
+
+  double _value = 0.0;
+  void _onChanged(double value) => setState(() => _value = new DateTime.now().toString());
+
+  @override
+  Widget build(BuildContext context){
+    return new Scaffold(
+      //..
+      children: <Widget>[
+        new Slider(value: _value, onChanged: _onChanged),
+        new Container(
+          padding: new EdgeInsets.all(32.0),
+          child: new LinearProgressIndicator(
+            value: _value,
+            valueColor: new AlwaysStoppedAnimation<Color>(Colors.green),
+
+          )
+        ),
+        new Container(
+          padding: new EdgeInsets.all(32.0),
+          child: new CircularProgressIndicator(
+            value: _value,
+          ),
+        ),
+      ]
+    ),
+  }
+}
+
+```
+
+**Popup Menu Button**
+
+```dart
+enum Animals { Cat, Dog, Bird, Lizard }
+class _State extends State<MyApp> {
+
+  Animals _selected = Animals.Cat;
+  String _value = 'Make a Selection';
+  List _items = new List();
+
+  @override
+  void initState(){
+    for(Animals animal in Animals.values){
+      _items.add(new PopupMenuItem(
+        child: new Text(_getDisplay(animal)),
+        value: animal
+      ));
+    }
+  }
+
+  void _onSelected(Animals animal){
+    setState(() {
+      _selected = animal;
+      _value = 'You Selected ${_getDisplay(animal)}';
+    })
+  }
+
+  String _getDisplay(Animals animal){
+    int index = animal.toString().indexOf(".");
+    index++;
+    return animal.toString().substring(index);
+  }
+
+
+  String _value = 'Nothing';
+  void _onPressed() => setState(() => _value = new DateTime.now().toString());
+
+  @override
+  Widget build(BuildContext context){
+    return new Scaffold(
+      //..
+      children: <Widget>[
+        new Container(
+          padding: new EdgeInsets.all(5.0),
+          child: new Text(_value);
+        ),
+        new PopupMeniButton<Animals>(
+          child: new Icon(Icons.input),
+          initialValue: Animals.Cat,
+          onSelected: _onSelected,
+          itemsBuilder: (Build context){
+            return _items;
+          }
+        ),
+      ]
+    ),
+  }
+}
+
+```
+
+### Layout Widgets
+
+**Expansion Panel**
+
+```dart
+
+class MyItem {
+  bool isExpanded;
+  final String header;
+  final Widget body;
+
+  MyItem(this.isExpanded, this.header, this.body);
+}
+
+class _State extends State<MyApp>{
+
+  List<MyItem> _items = new List<MyItem>();
+
+  @override
+  void initState(){
+    for(int i = 0; i < 10; i++){
+      _items.add(
+        new MyItem(false, 'Item $i', new Container(
+          padding: new EdgeInsets.all(10.0),
+          child: new Text('Hello World'),
+        ));
+      )
+    }
+  }
+
+  ExpansionPanel _createItem(MyItem item){
+    return new ExpansionPanel(
+      headerBuilder: (BuildContext contex, bool isExpanded){
+        return new Container(
+          padding: new EdgeInsets.all(5.0),
+          child: new Text('Header ${item.header}'),
+
+        )
+      },
+      body: item.body,
+      isExpanded: item.isExpanded
+    );
+  }
+
+  @override
+  Widget build(BuildContext context){
+    return new Scaffold(
+      //..
+      child: new ListView(
+        children: <Widget>[
+          new ExpansionPanelList(
+            exapansionCallback: (int index, bool isExpanded){
+              setState(() {
+                _items[index].isExpanded = !_items[index].isExpanded;
+              });
+            },
+            children :_items.map(_createitem).toList(),
+          ),
+        ]
+      )
+    ),
+  }
+}
+
+```
+
+**TabBar View**
+
+```dart
+
+class Choice {
+  final String title;
+  final IconData icon;
+  
+  Choice({this.icon, this.title})
+}
+
+class _State extends State<MyApp> with SingleTickerProviderStateMixin {
+
+  TabController _controller;
+  List<Choice> _items = const <Choice>[
+    const Choice(title: 'Car', icon: Icons.directions_car),
+    const Choice(title: 'Bicycle', icon: Icons.directions_bike),
+    const Choice(title: 'Boat', icon: Icons.directions_boat),
+    const Choice(title: 'Train', icon: Icons.directions_railway),    
+    const Choice(title: 'Walk', icon: Icons.directions_walk),
+  ];
+
+  String _value = 'Nothing';
+  void _onPressed() => setState(() => _value = new DateTime.now().toString());
+
+  @override
+  Widget build(BuildContext context){
+    return new Scaffold(
+      //..
+      new Text(_value),
+      new IconButton(
+        icons: Icon(Icons.timer),
+        onPressed: _onPressed,
+        tooltip: 'Click me',
+      )
+    ),
+  }
+}
+
+```
+
+### Charts
+
+### Custom Widgets
+
+### Navigation
+
+### State Manangement
+
+# Advanced
