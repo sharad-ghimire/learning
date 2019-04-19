@@ -1,16 +1,12 @@
-# maximillian_flutter
+- final is dart is same as const in javascript and in const we cannot change the value
 
-A new Flutter project.
+```dart
+final List<String> product = [];
+products = ["Hello"]; // Error
+products.add("Hello"); // We can add to that array though (reference type)
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+final List<String> product = const []; // Cannot add to an modifiable list
+products.add("S"); // Error
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.io/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.io/docs/cookbook)
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+```
