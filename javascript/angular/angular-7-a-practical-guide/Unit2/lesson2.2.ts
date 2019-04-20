@@ -1,0 +1,3 @@
+class Yo {
+  constructor(parameters) {}
+}
